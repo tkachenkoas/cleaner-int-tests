@@ -15,6 +15,7 @@ public class GeneratedApiClientConfiguration {
     @Bean
     public ApiClient apiClient(@Value("${server.port}") Integer serverPort) {
         RestTemplate restTemplate = new RestTemplate();
+        // to support PATCH requests
         restTemplate.setRequestFactory(new HttpComponentsClientHttpRequestFactory());
 
         ApiClient apiClient = new ApiClient(restTemplate);

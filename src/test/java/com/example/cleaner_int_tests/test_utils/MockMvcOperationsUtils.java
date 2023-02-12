@@ -7,6 +7,9 @@ import java.util.Map;
 
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 
+/**
+ * Contains various helper methods that help reduce amount of copy-paste
+ */
 public class MockMvcOperationsUtils {
 
     @SneakyThrows
