@@ -1,0 +1,61 @@
+plugins {
+    id 'java'
+    id 'groovy'
+
+    id 'org.springframework.boot' version '2.7.6'
+    id 'io.spring.dependency-management' version '1.0.15.RELEASE'
+
+    id 'org.springdoc.openapi-gradle-plugin' version '1.6.0'
+    id "org.openapi.generator" version "6.3.0"
+}
+
+group = 'com.example'
+version = '0.0.1-SNAPSHOT'
+sourceCompatibility = '17'
+
+configurations {
+    compileOnly {
+        extendsFrom annotationProcessor
+    }
+}
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    compileOnly 'org.projectlombok:lombok'
+    annotationProcessor 'org.projectlombok:lombok'
+
+    implementation 'org.springframework.boot:spring-boot-starter-web'
+    implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+
+    implementation 'org.apache.httpcomponents:httpclient'
+
+    implementation 'org.springdoc:springdoc-openapi-ui:1.6.14'
+
+    runtimeOnly 'com.h2database:h2'
+
+    testCompileOnly 'org.projectlombok:lombok'
+    testAnnotationProcessor 'org.projectlombok:lombok'
+
+    testImplementation 'org.springframework.boot:spring-boot-starter-test'
+    testImplementation 'org.codehaus.groovy:groovy-all:3.0.13'
+}
+
+task generateClient(type: org.openapitools.generator.gradle.plugin.tasks.GenerateTask){
+    generatorName = "java"
+    inputSpec = "$rootDir/build/openapi.json".toString()
+    outputDir = "$buildDir/generated".toString()
+    apiPackage = "com.example.apiclient.api"
+    library = 'resttemplate'
+    invokerPackage = "com.example.apiclient.invoker"
+    modelPackage = "com.example.apiclient.model"
+    configOptions = [
+            dateLibrary: "java8"
+    ]
+}
+
+tasks.named('test') {
+    useJUnitPlatform()
+}
