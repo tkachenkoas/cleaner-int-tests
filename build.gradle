@@ -39,14 +39,28 @@ dependencies {
     testCompileOnly 'org.projectlombok:lombok'
     testAnnotationProcessor 'org.projectlombok:lombok'
 
+    // for compilation of generated code
+    testImplementation 'org.openapitools:jackson-databind-nullable:0.2.6'
+    testImplementation 'com.google.code.findbugs:jsr305:3.0.2'
+
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
     testImplementation 'org.codehaus.groovy:groovy-all:3.0.13'
 }
 
-task generateClient(type: org.openapitools.generator.gradle.plugin.tasks.GenerateTask){
+// https://github.com/springdoc/springdoc-openapi-gradle-plugin
+openApi {
+    apiDocsUrl.set("http://localhost:8080/v3/api-docs.yaml")
+    outputDir.set(file("./"))
+    outputFileName.set("api-schema.yaml")
+}
+
+task generateClient(
+        type: org.openapitools.generator.gradle.plugin.tasks.GenerateTask,
+        group: 'openapi tools'
+){
     generatorName = "java"
-    inputSpec = "$rootDir/build/openapi.json".toString()
-    outputDir = "$buildDir/generated".toString()
+    inputSpec = "$rootDir/api-schema.yaml"
+    outputDir = "$buildDir/generated"
     apiPackage = "com.example.apiclient.api"
     library = 'resttemplate'
     invokerPackage = "com.example.apiclient.invoker"
@@ -55,6 +69,10 @@ task generateClient(type: org.openapitools.generator.gradle.plugin.tasks.Generat
             dateLibrary: "java8"
     ]
 }
+
+sourceSets.test.java.srcDirs += ['build/generated/src/main/java']
+
+compileTestJava.dependsOn generateClient
 
 tasks.named('test') {
     useJUnitPlatform()
