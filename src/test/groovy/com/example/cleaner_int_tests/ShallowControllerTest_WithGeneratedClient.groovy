@@ -48,6 +48,7 @@ class ShallowControllerTest_WithGeneratedClient {
                 .ingredients(["Phone", "Sushi bar", "Money"])
         )
 
+        assert response.id == "123"
         assert response.name == "Man sushi"
         assert response.instructions == "Call sushi bar"
         assert response.ingredients == ["Phone", "Sushi bar", "Money"]
@@ -55,10 +56,7 @@ class ShallowControllerTest_WithGeneratedClient {
         verify(mockRepository).save(any())
     }
 
-    @ComponentScan([
-            "com.example.cleaner_int_tests.web",
-            "com.example.apiclient.api"
-    ])
+    @ComponentScan(["com.example.cleaner_int_tests.web", "com.example.apiclient.api"])
     static class MockMvcShallowTestContext {
 
         @MockBean
