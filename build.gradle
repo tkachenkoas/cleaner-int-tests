@@ -40,8 +40,9 @@ dependencies {
     testAnnotationProcessor 'org.projectlombok:lombok'
 
     // for compilation of generated code
-    testImplementation 'org.openapitools:jackson-databind-nullable:0.2.6'
-    testImplementation 'com.google.code.findbugs:jsr305:3.0.2'
+    testCompileOnly 'org.openapitools:jackson-databind-nullable:0.2.6'
+    testCompileOnly 'com.google.code.findbugs:jsr305:3.0.2'
+    testCompileOnly "io.swagger:swagger-annotations:1.6.9"
 
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
     testImplementation 'org.codehaus.groovy:groovy-all:3.0.13'
@@ -54,25 +55,44 @@ openApi {
     outputFileName.set("api-schema.yaml")
 }
 
-task generateClient(
+task generateGroovyModels(
+        type: org.openapitools.generator.gradle.plugin.tasks.GenerateTask,
+        group: 'openapi tools'
+){
+    generatorName = "groovy"
+    doLast {
+        delete "build/generated/src/main/groovy/com/example/apiclient/api"
+    }
+}
+
+task generateJavaInvoker(
         type: org.openapitools.generator.gradle.plugin.tasks.GenerateTask,
         group: 'openapi tools'
 ){
     generatorName = "java"
-    inputSpec = "$rootDir/api-schema.yaml"
-    outputDir = "$buildDir/generated"
-    apiPackage = "com.example.apiclient.api"
     library = 'resttemplate'
-    invokerPackage = "com.example.apiclient.invoker"
-    modelPackage = "com.example.apiclient.model"
-    configOptions = [
-            dateLibrary: "java8"
-    ]
+    doLast {
+        delete "build/generated/src/main/java/com/example/apiclient/model"
+        copy {
+            from 'build/generated/src/main/java'
+            into "build/generated/src/main/groovy"
+        }
+    }
 }
 
-sourceSets.test.java.srcDirs += ['build/generated/src/main/java']
+[generateGroovyModels, generateJavaInvoker].each {
+    it.inputSpec = "$rootDir/api-schema.yaml"
+    it.outputDir = "$buildDir/generated"
+    it.apiPackage = "com.example.apiclient.api"
+    it.invokerPackage = "com.example.apiclient.invoker"
+    it.modelPackage = "com.example.apiclient.model"
+}
 
-compileTestJava.dependsOn generateClient
+sourceSets.test.groovy.srcDirs += [
+        'build/generated/src/main/groovy'
+]
+
+compileTestGroovy.dependsOn generateJavaInvoker, generateGroovyModels
 
 tasks.named('test') {
     useJUnitPlatform()

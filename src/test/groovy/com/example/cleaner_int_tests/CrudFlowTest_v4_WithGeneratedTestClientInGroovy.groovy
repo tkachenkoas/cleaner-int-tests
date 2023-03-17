@@ -1,5 +1,6 @@
 package com.example.cleaner_int_tests
 
+
 import com.example.apiclient.api.RecipesControllerApi
 import com.example.apiclient.model.RecipeRequest
 import org.junit.jupiter.api.MethodOrderer
@@ -21,10 +22,11 @@ class CrudFlowTest_v4_WithGeneratedTestClientInGroovy extends BaseFullContextTes
     @Test
     @Order(0)
     void createNewRecipe() {
-        def response = apiClient.createRecipe(new RecipeRequest()
-                .name("Man sushi").instructions("Call sushi bar")
-                .ingredients(["Phone", "Sushi bar", "Money"])
-        )
+        def response = apiClient.createRecipe(new RecipeRequest(
+                name: "Man sushi",
+                instructions: "Call sushi bar",
+                ingredients: ["Phone", "Sushi bar", "Money"]
+        ))
 
         assert response.name == "Man sushi"
         assert response.instructions == "Call sushi bar"
@@ -53,7 +55,7 @@ class CrudFlowTest_v4_WithGeneratedTestClientInGroovy extends BaseFullContextTes
     @Order(2)
     void shouldUpdateRecipeById_inPatchManner() {
         def patchResponse = apiClient.updateRecipe(
-                recipeId, new RecipeRequest().name("Lazy sushi")
+                recipeId, new RecipeRequest(name: "Lazy sushi")
         )
 
         assert patchResponse.name == "Lazy sushi"
