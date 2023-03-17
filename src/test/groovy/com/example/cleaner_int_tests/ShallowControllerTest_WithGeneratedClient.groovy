@@ -43,10 +43,11 @@ class ShallowControllerTest_WithGeneratedClient {
                 "Phone,Sushi bar,Money"
         ))
 
-        def response = apiClient.createRecipe(new RecipeRequest()
-                .name("Man sushi").instructions("Call sushi bar")
-                .ingredients(["Phone", "Sushi bar", "Money"])
-        )
+        def response = apiClient.createRecipe(new RecipeRequest(
+                name: "Man sushi",
+                instructions: "Call sushi bar",
+                ingredients: ["Phone", "Sushi bar", "Money"]
+        ))
 
         assert response.id == "123"
         assert response.name == "Man sushi"
